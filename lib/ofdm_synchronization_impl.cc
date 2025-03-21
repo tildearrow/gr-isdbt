@@ -131,9 +131,9 @@ namespace gr {
                   d_nextphaseinc = 0; 
                   d_nextpos = 0; 
                   d_phase = 0; 
-                  d_conj = (gr_complex *)volk_malloc((2 * d_fft_length + d_cp_length)*sizeof(gr_complex), d_align);
-                  d_norm = (float *)volk_malloc((2 * d_fft_length + d_cp_length)*sizeof(float), d_align);
-                  d_corr = (gr_complex *)volk_malloc((2 * d_fft_length + d_cp_length)*sizeof(gr_complex), d_align);
+                  d_conj = (gr_complex *)volk_malloc((4 * d_fft_length + d_cp_length)*sizeof(gr_complex), d_align);
+                  d_norm = (float *)volk_malloc((4 * d_fft_length + d_cp_length)*sizeof(float), d_align);
+                  d_corr = (gr_complex *)volk_malloc((4 * d_fft_length + d_cp_length)*sizeof(gr_complex), d_align);
                   peak_detect_init(0.3, 0.9);
 
                   d_postfft = (gr_complex *)volk_malloc(d_fft_length*sizeof(gr_complex), d_align);
@@ -685,7 +685,7 @@ namespace gr {
 
 
         bool
-            ofdm_synchronization_impl::ml_sync(const gr_complex * in, int lookup_start, int lookup_stop, int * cp_pos, float * peak_epsilon)
+            ofdm_synchronization_impl::ml_sync(const gr_complex * in, int lookup_start, int lookup_stop, int in_len, int * cp_pos, float * peak_epsilon)
             {
 
                 assert(lookup_start >= lookup_stop);
@@ -696,6 +696,9 @@ namespace gr {
                 // Calculate norm
                 low = lookup_stop - (d_cp_length + d_fft_length - 1);
                 size = lookup_start - low + 1;
+                //printf("  low: %d size: %d low+size: %d in_len: %d 2fc: %d\n",low,size,low+size,in_len,(4 * d_fft_length + d_cp_length));
+                assert(low+size<=in_len);
+                assert(low+size<=(4 * d_fft_length + d_cp_length));
                 volk_32fc_magnitude_squared_32f(&d_norm[low], &in[low], size);
 
                 // Calculate gamma on each point
@@ -769,6 +772,7 @@ namespace gr {
                     gr_vector_void_star &output_items)
             {
                 const gr_complex *in = (const gr_complex *) input_items[0];
+                const int nin=ninput_items[0];
                 gr_complex *out = (gr_complex *) output_items[0];
 
                 bool ch_output_connected = output_items.size()>=2; 
@@ -797,7 +801,8 @@ namespace gr {
                     {
                         // If we are here it means that we have no idea where the CP may be. We thus 
                         // search it thoroughly. We also perform a coarse frequency estimation. 
-                        d_initial_acquired = ml_sync(&in[d_consumed], 2 * d_fft_length + d_cp_length - 1, d_fft_length + d_cp_length - 1, &d_cp_start, &d_coarse_freq);
+                        //printf("nin: %d d_consumed: %d start: %d stop: %d\n",nin,d_consumed,2 * d_fft_length + d_cp_length - 1, d_fft_length + d_cp_length - 1);
+                        d_initial_acquired = ml_sync(&in[d_consumed], 2 * d_fft_length + d_cp_length - 1, d_fft_length + d_cp_length - 1, nin, &d_cp_start, &d_coarse_freq);
                         d_cp_found = d_initial_acquired; 
                         //the interpolation should be restarted too (not the correcting factor, 
                         //which should not have changed, only the phase of the interpolator)
@@ -825,7 +830,8 @@ namespace gr {
                         //estimates of frequency and CP position. 
                         int cp_start_temp; 
                         float coarse_freq_temp; 
-                        d_cp_found = ml_sync(&in[d_consumed], d_cp_start + 8, std::max(d_cp_start - 8,d_cp_length+d_fft_length-1), &cp_start_temp, &coarse_freq_temp);
+                        //printf("nin: %d d_consumed: %d start: %d stop: %d\n",nin,d_consumed,d_cp_start + 8, std::max(d_cp_start - 8,d_cp_length+d_fft_length-1));
+                        d_cp_found = ml_sync(&in[d_consumed], d_cp_start + 8, std::max(d_cp_start - 8,d_cp_length+d_fft_length-1), nin, &cp_start_temp, &coarse_freq_temp);
                         //d_cp_start = cp_start_temp; 
                         //d_coarse_freq = coarse_freq_temp; 
 
@@ -834,8 +840,9 @@ namespace gr {
                             // We may have not found the CP because the smaller search range was too small (rare, but possible, in 
                             // particular when sampling time error are present). We thus re-try with a bigger search range and 
                             // update d_cp_start. 
+                            //printf("nin: %d d_consumed: %d start: %d stop: %d\n",nin,d_consumed,d_cp_start+16, std::max(d_cp_start-16,d_cp_length+d_fft_length-1));
                             d_cp_found = ml_sync(&in[d_consumed], d_cp_start+16, std::max(d_cp_start-16,d_cp_length+d_fft_length-1), \
-                                    &d_cp_start, &coarse_freq_temp);
+                                    nin, &d_cp_start, &coarse_freq_temp);
                             
                             //Since I'm moving the position, the interpolator's phase should be restarted too
                             d_samp_phase = 0; 

@@ -218,7 +218,7 @@ namespace gr {
                  * the return value is used (either true or false). 
                  *
                  */
-                bool ml_sync(const gr_complex * in, int lookup_start, int lookup_stop, int * cp_pos, float * peak_epsilon);
+                bool ml_sync(const gr_complex * in, int lookup_start, int lookup_stop, int in_len, int * cp_pos, float * peak_epsilon);
 
                 /*!
                  * \brief Initializes the parameters used in the peak_detect_process. 
