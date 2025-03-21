@@ -15,7 +15,7 @@ parameters:
     option_labels: [MODE1 (2K), MODE2 (4K), MODE3 (8K)]
 -   id: cp_length
     label: Guard Interval
-    dtype: enum
+    dtype: float
     default: '0.125'
     options: ['0.250', '0.125', '0.0625', '0.03125']
     option_labels: [1/4, 1/8, 1/16, 1/32]
