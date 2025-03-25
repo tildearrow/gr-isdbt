@@ -36,6 +36,9 @@ inputs:
 -   domain: stream
     dtype: complex
     vlen: ${ 13*96*(2**(mode-1)) }
+-   domain: message
+    id: params
+    optional: true
 
 outputs:
 -   domain: stream

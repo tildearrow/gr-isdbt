@@ -38,6 +38,11 @@
 namespace gr {
     namespace isdbt {
 
+        static const int interleaveTable[3][8]={
+          {0,4,8,16,0,0,0,0},
+          {0,2,4,8,0,0,0,0},
+          {0,1,2,4,0,0,0,0}
+        };
 
         // TODO shouldn't these be defined somewhere else??
         const int time_deinterleaver_impl::d_data_carriers_mode1 = 96; 
@@ -59,6 +64,29 @@ namespace gr {
                     gr::io_signature::make(1, 1, sizeof(gr_complex)*d_total_segments*d_data_carriers_mode1*((int)pow(2.0,mode-1))))
         {
             d_mode = mode; 
+            d_carriers_per_segment = d_data_carriers_mode1*((int)pow(2.0,mode-1)); 
+            d_noutput = d_total_segments*d_carriers_per_segment; 
+
+            init_params(segments_A,length_A,segments_B,length_B,segments_C,length_C);
+
+            message_port_register_in(pmt::mp("params"));
+            set_msg_handler(pmt::mp("params"),[this](const pmt::pmt_t& msg) {
+              handle_tmcc(msg);
+            });
+        }
+
+        /*
+         * Our virtual destructor.
+         */
+        time_deinterleaver_impl::~time_deinterleaver_impl()
+        {
+            for (unsigned int i=0; i<d_shift.size();i++){
+                delete d_shift.back();
+                d_shift.pop_back();
+            }
+        }
+
+        void time_deinterleaver_impl::init_params(int segments_A, int length_A, int segments_B, int length_B, int segments_C, int length_C) {
             d_I_A = length_A; 
             d_I_B = length_B; 
             d_I_C = length_C; 
@@ -70,8 +98,6 @@ namespace gr {
             d_nsegments_B = segments_B; 
             d_nsegments_C = segments_C; 
 
-            d_carriers_per_segment = d_data_carriers_mode1*((int)pow(2.0,mode-1)); 
-            d_noutput = d_total_segments*d_carriers_per_segment; 
             int mi = 0;
 
             for (int segment=0; segment<d_nsegments_A; segment++)
@@ -101,17 +127,35 @@ namespace gr {
                     d_shift.push_back(new boost::circular_buffer<gr_complex>(d_I_C*(d_data_carriers_mode1-1-mi)+1,0)); 
                 }
             }
+
         }
 
-        /*
-         * Our virtual destructor.
-         */
-        time_deinterleaver_impl::~time_deinterleaver_impl()
-        {
-            for (unsigned int i=0; i<d_shift.size();i++){
-                delete d_shift.back();
-                d_shift.pop_back();
+        void time_deinterleaver_impl::handle_tmcc(const pmt::pmt_t& msg) {
+          if (is_u8vector(msg)) {
+            std::vector<uint8_t> tmcc=u8vector_elements(msg);
+            if (tmcc.size()==204) {
+              int length_A=((tmcc[34]<<2)|(tmcc[35]<<1)|tmcc[36]);
+              int length_B=((tmcc[47]<<2)|(tmcc[48]<<1)|tmcc[49]);
+              int length_C=((tmcc[60]<<2)|(tmcc[61]<<1)|tmcc[62]);
+              int segments_A=((tmcc[37]<<3)|(tmcc[38]<<2)|(tmcc[39]<<1)|tmcc[40]);
+              int segments_B=((tmcc[50]<<3)|(tmcc[51]<<2)|(tmcc[52]<<1)|tmcc[53]);
+              int segments_C=((tmcc[63]<<3)|(tmcc[64]<<2)|(tmcc[65]<<1)|tmcc[66]);
+
+              if (segments_A>13) segments_A=0;
+              if (segments_B>13) segments_B=0;
+              if (segments_C>13) segments_C=0;
+
+              length_A=interleaveTable[d_mode-1][length_A&7];
+              length_B=interleaveTable[d_mode-1][length_B&7];
+              length_C=interleaveTable[d_mode-1][length_C&7];
+
+              if (segments_A!=d_nsegments_A || segments_B!=d_nsegments_B || segments_C!=d_nsegments_C ||
+                  length_A!=d_I_A || length_B!=d_I_B || length_C!=d_I_C) {
+                printf("time deinterleaver: reinitializing params...\n");
+                init_params(segments_A,length_A,segments_B,length_B,segments_C,length_C);
+              }
             }
+          }
         }
 
         int

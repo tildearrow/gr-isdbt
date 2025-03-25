@@ -147,6 +147,8 @@ namespace gr {
                         unsigned char* outbuf);
 #endif
 
+                void handle_tmcc(const pmt::pmt_t& msg);
+
             public:
                 viterbi_decoder_impl(int constellation_size, int rate);
                 ~viterbi_decoder_impl();

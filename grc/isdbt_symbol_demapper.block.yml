@@ -47,6 +47,9 @@ inputs:
   dtype: complex
   vlen: ${13*96*(2**(mode-1))} 
   optional: 0
+- domain: message
+  id: params
+  optional: true
 
 outputs:
 - label: out A

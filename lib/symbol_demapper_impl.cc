@@ -115,7 +115,10 @@ namespace gr {
 		   	d_noutput_C = segments_C*d_carriers_per_segment;
 
 	
-            
+            message_port_register_in(pmt::mp("params"));
+            set_msg_handler(pmt::mp("params"),[this](const pmt::pmt_t& msg) {
+              handle_tmcc(msg);
+            });
         }
 
         /*
@@ -123,6 +126,10 @@ namespace gr {
          */
         symbol_demapper_impl::~symbol_demapper_impl()
         {
+        }
+
+        void symbol_demapper_impl::handle_tmcc(const pmt::pmt_t& msg) {
+          printf("symbol demapper: I've got my eye on you.\n");
         }
 
         unsigned int 

@@ -63,6 +63,8 @@ namespace gr {
          //them all to this structure. 
          std::vector<std::deque<unsigned char> *> d_shift; 
 
+         void handle_tmcc(const pmt::pmt_t& msg);
+
 
      public:
       bit_deinterleaver_impl(int mode, int segments, int constellation_size);

@@ -53,7 +53,7 @@ blocks:
     gui_hint: ''
     label: Center freq.
     type: int
-    value: '509143000'
+    value: '545143000'
   states:
     bus_sink: false
     bus_source: false
@@ -249,21 +249,6 @@ blocks:
     coordinate: [1296, 692.0]
     rotation: 0
     state: enabled
-- name: blocks_message_debug_0
-  id: blocks_message_debug
-  parameters:
-    affinity: ''
-    alias: ''
-    comment: ''
-    en_uvec: 'True'
-    log_level: info
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [1448, 272.0]
-    rotation: 0
-    state: enabled
 - name: blocks_nlog10_ff_0
   id: blocks_nlog10_ff
   parameters:
@@ -314,7 +299,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [360, 388.0]
+    coordinate: [184, 428.0]
     rotation: 180
     state: enabled
 - name: blocks_null_sink_1
@@ -398,6 +383,7 @@ blocks:
     alias: ''
     comment: ''
     constellation_size: '64'
+    layer: '1'
     maxoutbuf: '0'
     minoutbuf: '0'
     mode: '3'
@@ -406,7 +392,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [344, 444.0]
+    coordinate: [384, 444.0]
     rotation: 180
     state: enabled
 - name: isdbt_byte_deinterleaver_0
@@ -421,7 +407,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [104, 680.0]
+    coordinate: [96, 664.0]
     rotation: 0
     state: enabled
 - name: isdbt_energy_descrambler_0
@@ -453,7 +439,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1192, 500.0]
+    coordinate: [1208, 484.0]
     rotation: 180
     state: enabled
 - name: isdbt_ofdm_synchronization_0
@@ -508,7 +494,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [648, 384.0]
+    coordinate: [688, 416.0]
     rotation: 180
     state: enabled
 - name: isdbt_time_deinterleaver_0
@@ -530,7 +516,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [936, 464.0]
+    coordinate: [944, 384.0]
     rotation: 180
     state: enabled
 - name: isdbt_tmcc_decoder_0
@@ -547,7 +533,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1080, 240.0]
+    coordinate: [1088, 216.0]
     rotation: 0
     state: enabled
 - name: isdbt_viterbi_decoder_0
@@ -557,6 +543,7 @@ blocks:
     alias: ''
     comment: ''
     constellation_size: '64'
+    layer: '1'
     maxoutbuf: '0'
     minoutbuf: '0'
     rate: '2'
@@ -564,7 +551,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [104, 448.0]
+    coordinate: [96, 476.0]
     rotation: 180
     state: enabled
 - name: low_pass_filter_0
@@ -885,7 +872,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [144, 580.0]
+    coordinate: [128, 604.0]
     rotation: 0
     state: enabled
 - name: snippet_0
@@ -968,7 +955,10 @@ connections:
 - [isdbt_time_deinterleaver_0, '0', isdbt_symbol_demapper_0, '0']
 - [isdbt_tmcc_decoder_0, '0', blocks_vector_to_stream_0_2, '0']
 - [isdbt_tmcc_decoder_0, '0', isdbt_frequency_deinterleaver_0, '0']
-- [isdbt_tmcc_decoder_0, params, blocks_message_debug_0, log]
+- [isdbt_tmcc_decoder_0, params, isdbt_bit_deinterleaver_0, params]
+- [isdbt_tmcc_decoder_0, params, isdbt_symbol_demapper_0, params]
+- [isdbt_tmcc_decoder_0, params, isdbt_time_deinterleaver_0, params]
+- [isdbt_tmcc_decoder_0, params, isdbt_viterbi_decoder_0, params]
 - [isdbt_viterbi_decoder_0, '0', isdbt_byte_deinterleaver_0, '0']
 - [isdbt_viterbi_decoder_0, '1', single_pole_iir_filter_xx_0_0, '0']
 - [low_pass_filter_0, '0', isdbt_ofdm_synchronization_0, '0']

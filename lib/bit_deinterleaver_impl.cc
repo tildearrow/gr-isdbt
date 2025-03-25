@@ -151,6 +151,10 @@ namespace gr {
 				std::cout << "bit_deinterleaver: error in d_const_size_C\n";                  
 			}*/
 	
+            message_port_register_in(pmt::mp("params"));
+            set_msg_handler(pmt::mp("params"),[this](const pmt::pmt_t& msg) {
+              handle_tmcc(msg);
+            });
         }
 
         /*
@@ -158,6 +162,10 @@ namespace gr {
          */
         bit_deinterleaver_impl::~bit_deinterleaver_impl()
         {
+        }
+
+        void bit_deinterleaver_impl::handle_tmcc(const pmt::pmt_t& msg) {
+          printf("bit deinterleaver: I've got my eye on you.\n");
         }
 
         /*

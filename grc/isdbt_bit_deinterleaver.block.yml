@@ -13,6 +13,12 @@ parameters:
     default: '3'
     options: ['1', '2', '3']
     option_labels: [MODE1 (2K), MODE2 (4K), MODE3 (8K)]
+-   id: layer
+    label: Layer
+    dtype: enum
+    default: '0'
+    options: ['0', '1', '2']
+    option_labels: [A, B, C]
 -   id: segments
     label: Layer Segments
     dtype: int
@@ -28,6 +34,9 @@ inputs:
 -   domain: stream
     dtype: byte
     vlen: ${ (segments)*96*(2**(mode-1)) }
+-   domain: message
+    id: params
+    optional: true
 
 outputs:
 -   domain: stream

@@ -636,12 +636,21 @@ namespace gr {
                     viterbi_chunks_init_generic(d_metric0_generic, d_path0_generic);
                     printf("[Viterbi decoder] Choosing generic (slower) implementation\n");
 #endif
+
+                    message_port_register_in(pmt::mp("params"));
+                    set_msg_handler(pmt::mp("params"),[this](const pmt::pmt_t& msg) {
+                      handle_tmcc(msg);
+                    });
                 }
 
                 /*
                  * Our virtual destructor.
                  */
                 viterbi_decoder_impl::~viterbi_decoder_impl() { delete[] d_inbits; }
+
+                void viterbi_decoder_impl::handle_tmcc(const pmt::pmt_t& msg) {
+                  printf("viterbi decoder: I've got my eye on you.\n");
+                }
 
                 void viterbi_decoder_impl::forecast(int noutput_items,
                         gr_vector_int& ninput_items_required)

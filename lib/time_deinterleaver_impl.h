@@ -58,9 +58,12 @@ namespace gr {
         //std::vector< std::deque<gr_complex> *> d_shift; 
         std::vector< boost::circular_buffer<gr_complex> *> d_shift; 
 
+        void handle_tmcc(const pmt::pmt_t& msg);
+        void init_params(int segments_A, int length_A, int segments_B, int length_B, int segments_C, int length_C); 
+
      public:
       //time_deinterleaver_impl(int mode, int length);
-      time_deinterleaver_impl(int mode, int segments_A, int length_A, int segments_B, int length_B, int segments_C, int lenght_C); 
+      time_deinterleaver_impl(int mode, int segments_A, int length_A, int segments_B, int length_B, int segments_C, int length_C); 
       ~time_deinterleaver_impl();
 
       // Where all the action really happens

@@ -7,6 +7,12 @@ templates:
   make: isdbt.viterbi_decoder(${constellation_size}, ${rate})
 
 parameters:
+-   id: layer
+    label: Layer
+    dtype: enum
+    default: '0'
+    options: ['0', '1', '2']
+    option_labels: [A, B, C]
 -   id: constellation_size
     label: Modulation Scheme
     dtype: enum
@@ -20,9 +26,13 @@ parameters:
     options: ['0', '1', '2', '3', '4']
     option_labels: [1/2, 2/3, 3/4, 5/6, 7/8]
 
+
 inputs:
 -   domain: stream
     dtype: byte
+-   domain: message
+    id: params
+    optional: true
 
 outputs:
 -   domain: stream
