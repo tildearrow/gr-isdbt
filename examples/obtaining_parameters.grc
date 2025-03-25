@@ -181,7 +181,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [496, 396.0]
+    coordinate: [336, 380.0]
     rotation: 0
     state: enabled
 - name: samp_rate
@@ -223,7 +223,7 @@ blocks:
     bus_structure: null
     coordinate: [1300, 296]
     rotation: 0
-    state: enabled
+    state: disabled
 - name: blocks_delay_0
   id: blocks_delay
   parameters:
@@ -242,28 +242,6 @@ blocks:
     bus_source: false
     bus_structure: null
     coordinate: [727, 368]
-    rotation: 0
-    state: enabled
-- name: blocks_file_source_0
-  id: blocks_file_source
-  parameters:
-    affinity: ''
-    alias: ''
-    begin_tag: pmt.PMT_NIL
-    comment: ''
-    file: /tmp/iq_test
-    length: '0'
-    maxoutbuf: '0'
-    minoutbuf: '0'
-    offset: '0'
-    repeat: 'True'
-    type: complex
-    vlen: '1'
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [80, 500.0]
     rotation: 0
     state: disabled
 - name: blocks_moving_average_xx_0
@@ -285,7 +263,7 @@ blocks:
     bus_structure: null
     coordinate: [1040, 252.0]
     rotation: 0
-    state: enabled
+    state: disabled
 - name: blocks_multiply_conjugate_cc_0
   id: blocks_multiply_conjugate_cc
   parameters:
@@ -301,7 +279,7 @@ blocks:
     bus_structure: null
     coordinate: [824, 253]
     rotation: 0
-    state: enabled
+    state: disabled
 - name: blocks_null_sink_0
   id: blocks_null_sink
   parameters:
@@ -407,7 +385,7 @@ blocks:
     bus_structure: null
     coordinate: [884, 364]
     rotation: 0
-    state: true
+    state: disabled
 - name: note_0_0
   id: note
   parameters:
@@ -421,7 +399,7 @@ blocks:
     bus_structure: null
     coordinate: [922, 611]
     rotation: 0
-    state: true
+    state: disabled
 - name: qtgui_time_sink_x_0
   id: qtgui_time_sink_x
   parameters:
@@ -518,7 +496,7 @@ blocks:
     bus_structure: null
     coordinate: [1480, 268.0]
     rotation: 0
-    state: true
+    state: disabled
 - name: soapy_sdrplay_source_0
   id: soapy_sdrplay_source
   parameters:
@@ -550,7 +528,6 @@ blocks:
 connections:
 - [blocks_complex_to_mag_1, '0', qtgui_time_sink_x_0, '0']
 - [blocks_delay_0, '0', blocks_multiply_conjugate_cc_0, '1']
-- [blocks_file_source_0, '0', low_pass_filter_0, '0']
 - [blocks_moving_average_xx_0, '0', blocks_complex_to_mag_1, '0']
 - [blocks_multiply_conjugate_cc_0, '0', blocks_moving_average_xx_0, '0']
 - [isdbt_ofdm_synchronization_0, '0', blocks_null_sink_0_0, '0']

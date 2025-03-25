@@ -564,6 +564,18 @@ namespace gr {
                                 tmcc_print();
                             }
                             printf("TMCC OK\n"); 
+
+                            // send TMCC parameters through message port
+                            std::vector<uint8_t> dataVec;
+                            for (size_t _i=0; _i<d_rcv_tmcc_data.size(); _i++) {
+                              dataVec.push_back(d_rcv_tmcc_data[_i]);
+                            }
+                            pmt::pmt_t paramsMsg=pmt::init_u8vector(
+                              d_rcv_tmcc_data.size(),
+                              dataVec
+                            );
+
+                            message_port_pub(pmt::mp("params"),paramsMsg);
                         }
                         else
                         {
@@ -643,6 +655,8 @@ namespace gr {
 
             set_tag_propagation_policy(TPP_DONT); 
 
+            // Init TMCC message port
+            message_port_register_out(pmt::mp("params"));
         }
 
         /*
@@ -720,6 +734,7 @@ namespace gr {
                     }
                     else 
                     {
+                        printf("is this where it weirds out?\n");
                         printf("Warning: no relative index found in tag's stream in TMCC decoder. Mode: %i; i=%i\n", d_total_data_carriers, i); 
                     }
 
