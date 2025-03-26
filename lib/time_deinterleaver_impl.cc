@@ -151,7 +151,11 @@ namespace gr {
 
               if (segments_A!=d_nsegments_A || segments_B!=d_nsegments_B || segments_C!=d_nsegments_C ||
                   length_A!=d_I_A || length_B!=d_I_B || length_C!=d_I_C) {
-                printf("time deinterleaver: reinitializing params...\n");
+                printf("time deinterleaver: reinitializing params... (%d[%d], %d[%d], %d[%d])\n",
+                  segments_A, length_A,
+                  segments_B, length_B,
+                  segments_C, length_C
+                );
                 init_params(segments_A,length_A,segments_B,length_B,segments_C,length_C);
               }
             }

@@ -93,8 +93,10 @@ namespace gr {
                 // Code rate k/n
                 int d_k;
                 int d_n;
+                int d_rate;
                 // Constellation with m
                 int d_m;
+                int d_consts;
 
                 // Block size
                 int d_bsize;

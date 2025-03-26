@@ -54,6 +54,11 @@ namespace gr {
         const int bit_deinterleaver_impl::
             d_delay_64qam[6] = {0, 24, 48, 72, 96, 120}; 
 
+        // assume QPSK for unused
+        static const float consSizeTable[8]={
+          4, 4, 16, 64, 4, 4, 4, 4
+        };
+
         bit_deinterleaver::sptr
             bit_deinterleaver::make(int mode, int layer, int segments, int constellation_size)
             {
@@ -83,9 +88,6 @@ namespace gr {
 	    printf("d_noutput: %d\n",d_noutput);
 
             init_params(segments,constellation_size);
-            for (int lay = 0; lay<d_total_layers; lay++){
-                d_shift.push_back(new std::deque<unsigned char>(120,0)); 
-            }
 
             message_port_register_in(pmt::mp("params"));
             set_msg_handler(pmt::mp("params"),[this](const pmt::pmt_t& msg) {
@@ -119,11 +121,35 @@ namespace gr {
 				printf("bit_deinterleaver: error in d_const_size %d\n",d_const_size);                  
 			}
 
-            set_min_noutput_items(d_noutput_real);
+            //set_min_noutput_items(d_noutput_real);
+            set_interpolation(segments * d_data_carriers_mode1 * ((int)pow(2.0, d_mode-1)));
+            d_shift=std::deque<unsigned char>(120,0);
         }
 
         void bit_deinterleaver_impl::handle_tmcc(const pmt::pmt_t& msg) {
-          printf("bit deinterleaver: I've got my eye on you.\n");
+          if (is_u8vector(msg)) {
+            std::vector<uint8_t> tmcc=u8vector_elements(msg);
+            if (tmcc.size()==204) {
+              int segments[3];
+              int constellation_size[3];
+              segments[0]=((tmcc[37]<<3)|(tmcc[38]<<2)|(tmcc[39]<<1)|tmcc[40]);
+              segments[1]=((tmcc[50]<<3)|(tmcc[51]<<2)|(tmcc[52]<<1)|tmcc[53]);
+              segments[2]=((tmcc[63]<<3)|(tmcc[64]<<2)|(tmcc[65]<<1)|tmcc[66]);
+              constellation_size[0]=((tmcc[28]<<2) | (tmcc[29]<<1)| (tmcc[30]));
+              constellation_size[1]=((tmcc[41]<<2) | (tmcc[42]<<1)| (tmcc[43]));
+              constellation_size[2]=((tmcc[54]<<2) | (tmcc[55]<<1)| (tmcc[56]));
+        
+              for (int i=0; i<3; i++) {
+                if (segments[i]>13) segments[i]=0;
+                constellation_size[i]=consSizeTable[constellation_size[i]&7];
+              }
+
+              if (segments[d_layer]!=d_nsegments || constellation_size[d_layer]!=d_const_size) {
+                printf("bit deinterleaver: reinitializing params... (%d/%d)\n",segments[d_layer],constellation_size[d_layer]);
+                init_params(segments[d_layer],constellation_size[d_layer]);
+              }
+            }
+          }
         }
 
         /*
@@ -145,29 +171,28 @@ namespace gr {
 				// Do <+signal processing+>
                 unsigned char aux; 
                 unsigned char mask; 
-			for (int i=0; i<noutput_items/d_noutput; i++)
+			//printf("---BIT DEINTERLEAVER-> noutput_items = %d\n", noutput_items);				
+			for (int i=0; i<noutput_items/d_noutput_real; i++)
 			{
-			printf("---BIT DEINTERLEAVER-> noutput_items = %d\n", noutput_items);				
                         for (int carrier = 0; carrier<d_noutput_real; carrier++)
                         {
                             	// add new input symbol at beginning of container
                             	// Older symbols are at bigger indexes for consistency
                             	// with the d_delay implementation. 
-                            	d_shift[0]-> push_front(in[i*d_noutput + carrier]); 
+                            	d_shift.push_front(in[i*d_noutput + carrier]); 
                             	// Initialize aux variables to construct output
                             	aux = 0; 
                             	mask = 1; 
                             	for (int b=0; b<d_num_bits; b++){
                                 // Least significant bits more delayed in interleaver,
                                 // so now delay more the most significant bits
-                                aux |= (*d_shift[0])[d_delay[b]] & mask; 
-                                //aux |= d_shift[layer]->at(d_delay[b]) & mask; 
+                                aux |= d_shift[d_delay[b]] & mask; 
                                 mask = mask << 1;  
                             	
 								}
 								
-								d_shift[0]->pop_back();
-								out[i*d_noutput+carrier] = aux; 
+								d_shift.pop_back();
+								out[i*d_noutput_real+carrier] = aux; 
 								
 						}
                           

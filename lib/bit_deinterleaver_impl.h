@@ -62,7 +62,7 @@ namespace gr {
          //constellation size. 
          //TODO deques are worse than circular_buffers. We should eventually migrate
          //them all to this structure. 
-         std::vector<std::deque<unsigned char> *> d_shift; 
+         std::deque<unsigned char> d_shift; 
 
          void init_params(int segments, int constellation_size);
          void handle_tmcc(const pmt::pmt_t& msg);

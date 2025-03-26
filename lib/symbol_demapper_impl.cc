@@ -46,6 +46,11 @@ namespace gr {
         const float symbol_demapper_impl::d_th_16qam = 2.0/sqrt(10.0); 
         const float symbol_demapper_impl::d_th_64qam = 2.0/sqrt(42.0); 
 
+        // assume QPSK for unused
+        static const float consSizeTable[8]={
+          4, 4, 16, 64, 4, 4, 4, 4
+        };
+
         symbol_demapper::sptr
             symbol_demapper::make(int mode, int segments_A, int constellation_size_A, int segments_B, int constellation_size_B, int segments_C, int constellation_size_C)
             {
@@ -136,7 +141,40 @@ namespace gr {
         }
 
         void symbol_demapper_impl::handle_tmcc(const pmt::pmt_t& msg) {
-          printf("symbol demapper: I've got my eye on you.\n");
+          if (is_u8vector(msg)) {
+            std::vector<uint8_t> tmcc=u8vector_elements(msg);
+            if (tmcc.size()==204) {
+              int segments_A=((tmcc[37]<<3)|(tmcc[38]<<2)|(tmcc[39]<<1)|tmcc[40]);
+              int segments_B=((tmcc[50]<<3)|(tmcc[51]<<2)|(tmcc[52]<<1)|tmcc[53]);
+              int segments_C=((tmcc[63]<<3)|(tmcc[64]<<2)|(tmcc[65]<<1)|tmcc[66]);
+              int constellation_size_A=((tmcc[28]<<2) | (tmcc[29]<<1)| (tmcc[30]));
+              int constellation_size_B=((tmcc[41]<<2) | (tmcc[42]<<1)| (tmcc[43]));
+              int constellation_size_C=((tmcc[54]<<2) | (tmcc[55]<<1)| (tmcc[56]));
+
+              if (segments_A>13) segments_A=0;
+              if (segments_B>13) segments_B=0; 
+              if (segments_C>13) segments_C=0;
+
+              constellation_size_A=consSizeTable[constellation_size_A&7];
+              constellation_size_B=consSizeTable[constellation_size_B&7];
+              constellation_size_C=consSizeTable[constellation_size_C&7];
+
+              if ((d_nsegments_A>0 && d_const_size_A!=constellation_size_A) ||
+                  (d_nsegments_B>0 && d_const_size_B!=constellation_size_B) ||
+                  (d_nsegments_C>0 && d_const_size_C!=constellation_size_C) ||
+                  d_nsegments_A!=segments_A || d_nsegments_B!=segments_B || d_nsegments_C!=segments_C) {
+                  printf("symbol demapper: reinitializing params... (%d/%d, %d/%d, %d/%d)\n",
+                    segments_A,
+                    constellation_size_A,
+                    segments_B,
+                    constellation_size_B,
+                    segments_C,
+                    constellation_size_C
+                  );
+                  init_params(segments_A, constellation_size_A, segments_B, constellation_size_B, segments_C, constellation_size_C);
+              }
+            }
+          }
         }
 
         unsigned int 

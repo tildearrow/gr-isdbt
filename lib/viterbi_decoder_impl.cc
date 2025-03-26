@@ -49,6 +49,10 @@ namespace gr {
             1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
             0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
         };
+        // assume QPSK for unused
+        static const float consSizeTable[8]={
+          4, 4, 16, 64, 4, 4, 4, 4
+        };
 
 #ifdef DTV_SSE2
         __GR_ATTR_ALIGNED(16) __m128i viterbi_decoder_impl::d_metric0[4];
@@ -545,6 +549,7 @@ namespace gr {
                     // d_n: the output of the encoder
                     // d_puncture: depuncturing matrix
                     d_layer = layer;
+                    d_rate = rate;
 
                     switch (rate){
                         case 0:
@@ -583,6 +588,7 @@ namespace gr {
                     d_init = 0; 
                     // constellation size
                     d_m = log2(constellation_size);
+                    d_consts = constellation_size;
            
                     // TODO what's the best value for d_bsize??? 
                     //d_bsize = 204*8/d_k; 
@@ -651,7 +657,27 @@ namespace gr {
                 viterbi_decoder_impl::~viterbi_decoder_impl() { delete[] d_inbits; }
 
                 void viterbi_decoder_impl::handle_tmcc(const pmt::pmt_t& msg) {
-                  printf("viterbi decoder: I've got my eye on you.\n");
+                  if (is_u8vector(msg)) {
+                    std::vector<uint8_t> tmcc=u8vector_elements(msg);
+                    if (tmcc.size()==204) {
+                      int constellation_size[3];
+                      int rates[3];
+                      constellation_size[0]=((tmcc[28]<<2) | (tmcc[29]<<1)| (tmcc[30]));
+                      constellation_size[1]=((tmcc[41]<<2) | (tmcc[42]<<1)| (tmcc[43]));
+                      constellation_size[2]=((tmcc[54]<<2) | (tmcc[55]<<1)| (tmcc[56]));
+                      rates[0]=((tmcc[31]<<2) | (tmcc[32]<<1) | tmcc[33] );
+                      rates[1]=((tmcc[44]<<2) | (tmcc[45]<<1) | tmcc[46] );
+                      rates[2]=((tmcc[57]<<2) | (tmcc[58]<<1) | tmcc[59] );
+                
+                      for (int i=0; i<3; i++) {
+                        constellation_size[i]=consSizeTable[constellation_size[i]&7];
+                      }
+
+                      if (constellation_size[d_layer]!=d_consts || rates[d_layer]!=d_rate) {
+                        printf("TODO: SWITCH TO %d with RATE %d!\n",constellation_size[d_layer],rates[d_layer]);
+                      }
+                    }
+                  }
                 }
 
                 void viterbi_decoder_impl::forecast(int noutput_items,

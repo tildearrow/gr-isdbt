@@ -53,7 +53,7 @@ blocks:
     gui_hint: ''
     label: Center freq.
     type: int
-    value: '563143000'
+    value: '509143000'
   states:
     bus_sink: false
     bus_source: false
@@ -382,17 +382,17 @@ blocks:
     affinity: ''
     alias: ''
     comment: ''
-    constellation_size: '64'
+    constellation_size: '16'
     layer: '1'
     maxoutbuf: '0'
     minoutbuf: '0'
     mode: '3'
-    segments: '12'
+    segments: '4'
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [368, 444.0]
+    coordinate: [368, 452.0]
     rotation: 180
     state: enabled
 - name: isdbt_byte_deinterleaver_0
@@ -488,8 +488,8 @@ blocks:
     minoutbuf: '0'
     mode: '3'
     segments_A: '1'
-    segments_B: '12'
-    segments_C: '0'
+    segments_B: '6'
+    segments_C: '6'
   states:
     bus_sink: false
     bus_source: false
@@ -503,15 +503,15 @@ blocks:
     affinity: ''
     alias: ''
     comment: ''
-    length_A: '2'
-    length_B: '4'
-    length_C: '0'
+    length_A: '4'
+    length_B: '2'
+    length_C: '2'
     maxoutbuf: '0'
     minoutbuf: '0'
     mode: '3'
     segments_A: '1'
-    segments_B: '12'
-    segments_C: '0'
+    segments_B: '6'
+    segments_C: '6'
   states:
     bus_sink: false
     bus_source: false
