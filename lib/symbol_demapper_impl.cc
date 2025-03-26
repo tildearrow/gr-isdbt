@@ -53,30 +53,18 @@ namespace gr {
                     (new symbol_demapper_impl(mode, segments_A, constellation_size_A, segments_B, constellation_size_B, segments_C, constellation_size_C));
             }
 
-        /*
-         * The private constructor
-         */
-        symbol_demapper_impl::
-            symbol_demapper_impl(int mode, int segments_A, int constellation_size_A, int segments_B, int constellation_size_B, int segments_C, int constellation_size_C)
-                : gr::sync_block("symbol_demapper",
-                    gr::io_signature::make(1, 1, 
-                        sizeof(gr_complex) * d_total_segments *
-                            d_data_carriers_mode1 * ((int)pow(2.0,mode-1))),
-                    gr::io_signature::make3(1, 3, sizeof(unsigned char) * segments_A * d_data_carriers_mode1 * ((int)pow(2.0,mode-1)), sizeof(unsigned char) * (segments_B?segments_B:1) * d_data_carriers_mode1 * ((int)pow(2.0,mode-1)), sizeof(unsigned char) * (segments_C?segments_C:1) * d_data_carriers_mode1 * ((int)pow(2.0,mode-1))))
-                        //sizeof(unsigned char) * d_total_segments * d_data_carriers_mode1 * ((int)pow(2.0,mode-1))))
-        {
-            d_mode = mode; 
+        void symbol_demapper_impl::init_params(int segments_A, int constellation_size_A, int segments_B, int constellation_size_B, int segments_C, int constellation_size_C) {
             d_const_size_A = constellation_size_A;
-		   	d_const_size_B = constellation_size_B;
-			d_const_size_C = constellation_size_C;	
+            d_const_size_B = constellation_size_B;
+            d_const_size_C = constellation_size_C;	
             
-			// We check if the total segments are what the should
-			assert(segments_A + segments_B + segments_C == d_total_segments);
+            // We check if the total segments are what the should
+            assert(segments_A + segments_B + segments_C == d_total_segments);
 
-			d_nsegments_A = segments_A;
-			d_nsegments_B = segments_B;
-			d_nsegments_C = segments_C;
-			if (d_const_size_A==4) {
+            d_nsegments_A = segments_A;
+            d_nsegments_B = segments_B;
+            d_nsegments_C = segments_C;
+            if (d_const_size_A==4) {
                 find_constellation_value_lA = &symbol_demapper_impl::find_constellation_value_qpsk; 
             } else if (d_const_size_A==16) {
                 find_constellation_value_lA = &symbol_demapper_impl::find_constellation_value_16qam; 
@@ -106,14 +94,33 @@ namespace gr {
 				std::cout << "symbol_demapper: error in d_const_size_C\n";
 			}
 
-            d_carriers_per_segment = d_data_carriers_mode1 * 
-                ((int)pow(2.0,mode-1)); 
-            
-            d_noutput = d_total_segments*d_carriers_per_segment;
 		   	d_noutput_A = segments_A*d_carriers_per_segment;
 		   	d_noutput_B = segments_B*d_carriers_per_segment;
 		   	d_noutput_C = segments_C*d_carriers_per_segment;
 
+        }
+
+
+        /*
+         * The private constructor
+         */
+        symbol_demapper_impl::
+            symbol_demapper_impl(int mode, int segments_A, int constellation_size_A, int segments_B, int constellation_size_B, int segments_C, int constellation_size_C)
+                : gr::sync_block("symbol_demapper",
+                    gr::io_signature::make(1, 1, 
+                        sizeof(gr_complex) * d_total_segments *
+                            d_data_carriers_mode1 * ((int)pow(2.0,mode-1))),
+                    gr::io_signature::make3(1, 3, sizeof(unsigned char) * d_total_segments * d_data_carriers_mode1 * ((int)pow(2.0,mode-1)), sizeof(unsigned char) * d_total_segments * d_data_carriers_mode1 * ((int)pow(2.0,mode-1)), sizeof(unsigned char) * d_total_segments * d_data_carriers_mode1 * ((int)pow(2.0,mode-1))))
+                        //sizeof(unsigned char) * d_total_segments * d_data_carriers_mode1 * ((int)pow(2.0,mode-1))))
+        {
+            d_mode = mode; 
+
+            d_carriers_per_segment = d_data_carriers_mode1 * 
+                ((int)pow(2.0,mode-1)); 
+            
+            d_noutput = d_total_segments*d_carriers_per_segment;
+
+            init_params(segments_A, constellation_size_A, segments_B, constellation_size_B, segments_C, constellation_size_C);
 	
             message_port_register_in(pmt::mp("params"));
             set_msg_handler(pmt::mp("params"),[this](const pmt::pmt_t& msg) {
@@ -171,13 +178,13 @@ namespace gr {
 				for (int i = 0; i < noutput_items; i++)
                 {
                     for (int carrier = 0; carrier<d_noutput_A; carrier++){
-						out_A[i*d_noutput_A+carrier] = (this->*find_constellation_value_lA)(in[i*d_noutput+carrier]);
+						out_A[i*d_noutput+carrier] = (this->*find_constellation_value_lA)(in[i*d_noutput+carrier]);
 					}
 					if(out_B_connected) for (int carrier = d_noutput_A; carrier<d_noutput_A+d_noutput_B; carrier++){
-						out_B[i*d_noutput_B+carrier-d_noutput_A] = (this->*find_constellation_value_lB)(in[i*d_noutput+carrier]);
+						out_B[i*d_noutput+carrier-d_noutput_A] = (this->*find_constellation_value_lB)(in[i*d_noutput+carrier]);
 					}
                     if (out_C_connected) for (int carrier = d_noutput_A+d_noutput_B; carrier<d_noutput; carrier++){
-						out_C[i*d_noutput_C+carrier-(d_noutput_A+d_noutput_B)] = (this->*find_constellation_value_lC)(in[i*d_noutput+carrier]);
+						out_C[i*d_noutput+carrier-(d_noutput_A+d_noutput_B)] = (this->*find_constellation_value_lC)(in[i*d_noutput+carrier]);
 					}
 
                 }

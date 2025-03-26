@@ -105,6 +105,9 @@ namespace gr {
                 // Number of full packed out bytes
                 int d_nout;
 
+                // Layer
+                int d_layer;
+
                 int d_last_minmetric;
                 int d_last_bestmetric;
                 float d_new_ber;
@@ -150,7 +153,7 @@ namespace gr {
                 void handle_tmcc(const pmt::pmt_t& msg);
 
             public:
-                viterbi_decoder_impl(int constellation_size, int rate);
+                viterbi_decoder_impl(int layer, int constellation_size, int rate);
                 ~viterbi_decoder_impl();
 
                 void forecast(int noutput_items, gr_vector_int& ninput_items_required);

@@ -522,16 +522,16 @@ namespace gr {
                     return correct_bits;
                 }
 
-                viterbi_decoder::sptr viterbi_decoder::make(int constellation_size, int rate)
+                viterbi_decoder::sptr viterbi_decoder::make(int layer, int constellation_size, int rate)
                 {
                     return gnuradio::get_initial_sptr(
-                            new viterbi_decoder_impl(constellation_size, rate));
+                            new viterbi_decoder_impl(layer, constellation_size, rate));
                 }
 
                 /*
                  * The private constructor
                  */
-                viterbi_decoder_impl::viterbi_decoder_impl(int constellation_size, int rate)
+                viterbi_decoder_impl::viterbi_decoder_impl(int layer, int constellation_size, int rate)
                     : block("viterbi_decoder",
                             io_signature::make(1, 1, sizeof(unsigned char)),
                             io_signature::make2(1, 2, sizeof(unsigned char), sizeof(float)))
@@ -544,6 +544,8 @@ namespace gr {
                     // d_k: the input of the encoder
                     // d_n: the output of the encoder
                     // d_puncture: depuncturing matrix
+                    d_layer = layer;
+
                     switch (rate){
                         case 0:
                             d_k = 1;

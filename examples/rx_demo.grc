@@ -53,7 +53,7 @@ blocks:
     gui_hint: ''
     label: Center freq.
     type: int
-    value: '545143000'
+    value: '563143000'
   states:
     bus_sink: false
     bus_source: false
@@ -294,12 +294,12 @@ blocks:
     comment: ''
     num_inputs: '1'
     type: byte
-    vlen: 3*(2**(4+mode))
+    vlen: 13*3*(2**(4+mode))
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [184, 428.0]
+    coordinate: [408, 388.0]
     rotation: 180
     state: enabled
 - name: blocks_null_sink_1
@@ -392,7 +392,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [384, 444.0]
+    coordinate: [368, 444.0]
     rotation: 180
     state: enabled
 - name: isdbt_byte_deinterleaver_0
@@ -854,7 +854,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [784, 140.0]
+    coordinate: [816, 148.0]
     rotation: 0
     state: enabled
 - name: single_pole_iir_filter_xx_0_0

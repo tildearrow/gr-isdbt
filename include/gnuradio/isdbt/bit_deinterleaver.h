@@ -52,10 +52,11 @@ namespace gr {
        * delay to different bits in the symbols).
        *
        * \param mode Transmission mode (either 1, 2 or 3). 
+       * \param layer Layer...
        * \param segments The number of segments to be de-interleaved. 
        * \param constellation_size The constellation used (4 for QPSK, 16 for 16QAM and 64 for 64QAM).
        */
-      static sptr make(int mode, int segments, int constellation_size);
+      static sptr make(int mode, int layer, int segments, int constellation_size);
     };
 
   } // namespace isdbt

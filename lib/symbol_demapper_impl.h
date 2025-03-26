@@ -88,6 +88,7 @@ namespace gr {
                  */
                 unsigned int find_constellation_value_64qam(gr_complex val);
 
+                void init_params(int segments_A, int constellation_size_A, int segments_B, int constellation_size_B, int segments_C, int constellation_size_C);
                 void handle_tmcc(const pmt::pmt_t& msg);
 
             public:

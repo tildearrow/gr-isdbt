@@ -16,7 +16,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0) */
 /* BINDTOOL_USE_PYGCCXML(0) */
 /* BINDTOOL_HEADER_FILE(viterbi_decoder.h) */
-/* BINDTOOL_HEADER_FILE_HASH(79a81c82e1f6ba689c28ba1dc206ce5f) */
+/* BINDTOOL_HEADER_FILE_HASH(772d86eb9dc79b58ee11f8b0ef309643) */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -37,7 +37,7 @@ void bind_viterbi_decoder(py::module &m) {
              std::shared_ptr<viterbi_decoder>>(m, "viterbi_decoder",
                                                D(viterbi_decoder))
 
-      .def(py::init(&viterbi_decoder::make), py::arg("constellation_size"),
+      .def(py::init(&viterbi_decoder::make), py::arg("layer"), py::arg("constellation_size"),
            py::arg("rate"), D(viterbi_decoder, make))
 
       ;

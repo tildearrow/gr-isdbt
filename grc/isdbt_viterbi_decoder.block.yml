@@ -4,7 +4,7 @@ category: '[isdbt]'
 
 templates:
   imports: import gnuradio.isdbt as isdbt
-  make: isdbt.viterbi_decoder(${constellation_size}, ${rate})
+  make: isdbt.viterbi_decoder(${layer}, ${constellation_size}, ${rate})
 
 parameters:
 -   id: layer

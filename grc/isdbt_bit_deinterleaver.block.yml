@@ -4,7 +4,7 @@ category: '[isdbt]'
 
 templates:
   imports: import gnuradio.isdbt as isdbt
-  make: isdbt.bit_deinterleaver(${mode}, ${segments}, ${constellation_size})
+  make: isdbt.bit_deinterleaver(${mode}, ${layer}, ${segments}, ${constellation_size})
 
 parameters:
 -   id: mode
@@ -33,7 +33,7 @@ parameters:
 inputs:
 -   domain: stream
     dtype: byte
-    vlen: ${ (segments)*96*(2**(mode-1)) }
+    vlen: ${ 13*96*(2**(mode-1)) }
 -   domain: message
     id: params
     optional: true

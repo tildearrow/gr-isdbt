@@ -55,17 +55,17 @@ outputs:
 - label: out A
   domain: stream 
   dtype: byte
-  vlen: ${ (segments_A)*96*(2**(mode-1))} 
+  vlen: ${ 13*96*(2**(mode-1))} 
   optional: 0
 - label: out B
   domain: stream 
   dtype: byte
-  vlen: ${ (segments_B)*96*(2**(mode-1))} 
+  vlen: ${ 13*96*(2**(mode-1))} 
   optional: 1
 - label: out C
   domain: stream 
   dtype: byte
-  vlen: ${ (segments_C)*96*(2**(mode-1)) }
+  vlen: ${ 13*96*(2**(mode-1)) }
   optional: 1
 
 

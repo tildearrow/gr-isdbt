@@ -16,7 +16,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0) */
 /* BINDTOOL_USE_PYGCCXML(0) */
 /* BINDTOOL_HEADER_FILE(bit_deinterleaver.h) */
-/* BINDTOOL_HEADER_FILE_HASH(667b74b67fbde392e5b0d4fa4535c0f9) */
+/* BINDTOOL_HEADER_FILE_HASH(1c49d2226d9e78d3bdeca5c2373fcd83) */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -33,11 +33,11 @@ void bind_bit_deinterleaver(py::module &m) {
 
   using bit_deinterleaver = ::gr::isdbt::bit_deinterleaver;
 
-  py::class_<bit_deinterleaver, gr::sync_interpolator,
+  py::class_<bit_deinterleaver, gr::block,
              std::shared_ptr<bit_deinterleaver>>(m, "bit_deinterleaver",
                                                  D(bit_deinterleaver))
 
-      .def(py::init(&bit_deinterleaver::make), py::arg("mode"),
+      .def(py::init(&bit_deinterleaver::make), py::arg("mode"), py::arg("layer"),
            py::arg("segments"), py::arg("constellation_size"),
            D(bit_deinterleaver, make))
 
